@@ -1,0 +1,45 @@
+# IDE and OS Files
+# ------------------------------------
+.idea/
+.vscode/
+*.suo
+*.user
+*.sln
+.DS_Store
+
+# Log Files
+# ------------------------------------
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variables
+# ------------------------------------
+.env
+.env.local
+.env.*.local
+*.env
+
+# Build and Dependency Folders
+# ==============================
+
+# Backend (Node.js)
+# Specify path from the project root
+# ------------------------------------
+/backend/node_modules
+/backend/dist
+/backend/coverage
+
+# Frontend (Angular)
+# Specify path from the project root
+# ------------------------------------
+/frontend/node_modules
+/frontend/dist
+/frontend/coverage
+/frontend/.angular
+
+# Temporary Package Files
+# -------------------------
+*.tgz
