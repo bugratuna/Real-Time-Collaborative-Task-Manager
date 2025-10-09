@@ -1,0 +1,22 @@
+<section class="min-h-screen flex items-center justify-center px-4 py-12 text-slate-100">
+  <mat-card class="max-w-2xl w-full bg-slate-900/70 backdrop-blur border border-slate-700">
+    <mat-card-header class="flex flex-col items-start gap-2">
+      <h2 class="text-3xl font-semibold text-white">Welcome back!</h2>
+      <p class="text-sm text-slate-300">You are authenticated and connected to the collaboration hub.</p>
+    </mat-card-header>
+    <mat-card-content class="space-y-6 text-slate-200">
+      <p class="text-base">
+        Logged in as
+        <span class="font-semibold text-white">{{ user()?.name }}</span>
+        (<span class="text-sky-300">{{ user()?.email }}</span>)
+      </p>
+      <p>
+        This dashboard is ready for real-time task management. Socket.IO is configured on the backend, so integrating
+        live board updates or collaborative cursors is just an event away.
+      </p>
+    </mat-card-content>
+    <mat-card-actions class="justify-end">
+      <button mat-stroked-button color="accent" (click)="logout()">Sign out</button>
+    </mat-card-actions>
+  </mat-card>
+</section>

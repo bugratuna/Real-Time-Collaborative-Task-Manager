@@ -1,0 +1,88 @@
+<section class="min-h-screen flex flex-col justify-center items-center px-4 py-8 text-slate-100">
+  <div class="max-w-6xl w-full grid gap-10 lg:grid-cols-2 items-center">
+    <div class="space-y-6">
+      <h1 class="text-4xl sm:text-5xl font-semibold leading-tight">
+        Real-time collaboration starts with a secure sign in.
+      </h1>
+      <p class="text-base sm:text-lg text-slate-300">
+        Manage projects, plan tasks, and collaborate with your team effortlessly. Use the credentials you created to
+        access your workspace and stay connected.
+      </p>
+      <ul class="space-y-3 text-slate-300">
+        <li class="flex items-start gap-3">
+          <mat-icon fontSet="material-symbols-rounded" fontIcon="shield_lock" class="text-emerald-400 mt-0.5"></mat-icon>
+          <span>Enterprise-grade authentication powered by JWT and Zod validation.</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <mat-icon fontSet="material-symbols-rounded" fontIcon="bolt" class="text-amber-300 mt-0.5"></mat-icon>
+          <span>Instant updates via Socket.IO keep everyone aligned.</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <mat-icon fontSet="material-symbols-rounded" fontIcon="palette" class="text-sky-300 mt-0.5"></mat-icon>
+          <span>Angular Material and Tailwind CSS deliver a polished experience.</span>
+        </li>
+      </ul>
+    </div>
+
+    <mat-card appearance="outlined" class="bg-slate-900/60 backdrop-blur border border-slate-700">
+      <mat-card-header class="flex flex-col items-start gap-2">
+        <h2 class="text-2xl font-semibold text-white">Sign in</h2>
+        <p class="text-sm text-slate-300">Enter your credentials to access the collaborative dashboard.</p>
+      </mat-card-header>
+      <mat-card-content>
+        <form class="space-y-6 mt-4" [formGroup]="form" (ngSubmit)="submit()">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="you@example.com" type="email" />
+            <mat-error *ngIf="form.controls.email.hasError('required')">Email is required</mat-error>
+            <mat-error *ngIf="form.controls.email.hasError('email')">Enter a valid email</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              [type]="passwordVisible() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="passwordVisible() ? 'Hide password' : 'Show password'"
+              class="text-slate-300"
+            >
+              <mat-icon>{{ passwordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="form.controls.password.hasError('required')">Password is required</mat-error>
+            <mat-error *ngIf="form.controls.password.hasError('minlength')">
+              Password must be at least 6 characters
+            </mat-error>
+          </mat-form-field>
+
+          <button
+            mat-flat-button
+            color="primary"
+            class="w-full h-12 flex items-center justify-center gap-2 text-base font-medium"
+            [disabled]="submitDisabled()"
+            type="submit"
+          >
+            <mat-progress-spinner
+              *ngIf="isSubmitting()"
+              diameter="20"
+              mode="indeterminate"
+              color="accent"
+              strokeWidth="3"
+              class="!text-white"
+            ></mat-progress-spinner>
+            <span *ngIf="!isSubmitting()">Sign in</span>
+            <span *ngIf="isSubmitting()">Signing in...</span>
+          </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>
