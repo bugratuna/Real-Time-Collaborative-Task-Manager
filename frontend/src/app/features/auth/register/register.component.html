@@ -1,0 +1,125 @@
+<section class="min-h-screen flex flex-col justify-center items-center px-4 py-8 text-slate-100">
+  <div class="max-w-6xl w-full grid gap-10 lg:grid-cols-2 items-center">
+    <div class="space-y-6 order-last lg:order-first">
+      <h1 class="text-4xl sm:text-5xl font-semibold leading-tight">
+        Create your workspace account and start planning together.
+      </h1>
+      <p class="text-base sm:text-lg text-slate-300">
+        Sign up to build boards, assign tasks, and collaborate in real time with your team. Your account keeps
+        everything synchronized across devices.
+      </p>
+      <ul class="space-y-3 text-slate-300">
+        <li class="flex items-start gap-3">
+          <mat-icon fontSet="material-symbols-rounded" fontIcon="groups" class="text-sky-300 mt-0.5"></mat-icon>
+          <span>Invite teammates instantly once you create your profile.</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <mat-icon fontSet="material-symbols-rounded" fontIcon="lock" class="text-emerald-400 mt-0.5"></mat-icon>
+          <span>Passwords are encrypted server-side and validated with Zod.</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <mat-icon fontSet="material-symbols-rounded" fontIcon="notifications" class="text-amber-300 mt-0.5"></mat-icon>
+          <span>Stay informed with real-time updates powered by Socket.IO.</span>
+        </li>
+      </ul>
+    </div>
+
+    <mat-card appearance="outlined" class="bg-slate-900/60 backdrop-blur border border-slate-700">
+      <mat-card-header class="flex flex-col items-start gap-2">
+        <h2 class="text-2xl font-semibold text-white">Create account</h2>
+        <p class="text-sm text-slate-300">Fill in your details to start managing tasks collaboratively.</p>
+      </mat-card-header>
+      <mat-card-content>
+        <form class="space-y-6 mt-4" [formGroup]="form" (ngSubmit)="submit()">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Full name</mat-label>
+            <input matInput formControlName="name" placeholder="Taylor Jenkins" type="text" />
+            <mat-error *ngIf="form.controls.name.hasError('required')">Name is required</mat-error>
+            <mat-error *ngIf="form.controls.name.hasError('minlength')">Enter at least 2 characters</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="you@example.com" type="email" />
+            <mat-error *ngIf="form.controls.email.hasError('required')">Email is required</mat-error>
+            <mat-error *ngIf="form.controls.email.hasError('email')">Enter a valid email</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              [type]="passwordVisible() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Create a password"
+              autocomplete="new-password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="passwordVisible() ? 'Hide password' : 'Show password'"
+              class="text-slate-300"
+            >
+              <mat-icon>{{ passwordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="form.controls.password.hasError('required')">Password is required</mat-error>
+            <mat-error *ngIf="form.controls.password.hasError('minlength')">
+              Password must be at least 6 characters
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Confirm password</mat-label>
+            <input
+              matInput
+              [type]="confirmPasswordVisible() ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="Re-enter your password"
+              autocomplete="new-password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="toggleConfirmPasswordVisibility()"
+              [attr.aria-label]="confirmPasswordVisible() ? 'Hide password' : 'Show password'"
+              class="text-slate-300"
+            >
+              <mat-icon>{{ confirmPasswordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="form.controls.confirmPassword.hasError('required')">Confirm your password</mat-error>
+            <mat-error *ngIf="form.hasError('passwordMismatch') && form.controls.confirmPassword.touched">
+              Passwords must match
+            </mat-error>
+          </mat-form-field>
+
+          <button
+            mat-flat-button
+            color="primary"
+            class="w-full h-12 flex items-center justify-center gap-2 text-base font-medium"
+            [disabled]="submitDisabled()"
+            type="submit"
+          >
+            <mat-progress-spinner
+              *ngIf="isSubmitting()"
+              diameter="20"
+              mode="indeterminate"
+              color="accent"
+              strokeWidth="3"
+              class="!text-white"
+            ></mat-progress-spinner>
+            <span *ngIf="!isSubmitting()">Create account</span>
+            <span *ngIf="isSubmitting()">Creating...</span>
+          </button>
+        </form>
+
+        <p class="mt-6 text-sm text-slate-300 text-center">
+          Already have an account?
+          <a routerLink="/" class="text-emerald-400 font-medium hover:underline">Sign in</a>
+        </p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>
