@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const buildMongoUri = () => {
   if (process.env.MONGODB_URI) {
-    return process.env.MONGODB_URI;
+    return process.env.MONGODB_URI | 'mongodb://localhost:27017/realtimetaskmanager';
   }
 
   const host = process.env.MONGODB_HOST || '127.0.0.1';
