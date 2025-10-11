@@ -1,39 +1,59 @@
-// Load environment variables from .env file
 require('dotenv').config();
 
+const http = require('http');
 const express = require('express');
 const cors = require('cors');
+const { Server } = require('socket.io');
 
-// TODO: Import database connection function
-// TODO: Import routes
-// TODO: Setup Swagger
+const { connectDB } = require('./config/database');
+const authRoutes = require('./routes/auth.routes');
+const boardRoutes = require('./routes/task-board.routes');
+const { errorHandler, notFoundHandler } = require('./middleware/error-handler');
+const { registerSocketHandlers } = require('./socket');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const server = http.createServer(app);
 
-// --- Core Middlewares ---
-// Enable Cross-Origin Resource Sharing
-app.use(cors());
-// Parse JSON bodies for incoming requests
+const clientOrigin = process.env.CLIENT_URL || 'http://localhost:4200';
+
+const io = new Server(server, {
+  cors: {
+    origin: clientOrigin,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+  }
+});
+
+registerSocketHandlers(io);
+
+app.set('io', io);
+
+app.use(
+  cors({
+    origin: clientOrigin,
+    credentials: true
+  })
+);
 app.use(express.json());
 
-// --- API Routes ---
-// A simple health check route
-app.get('/', (req, res) => {
-    res.status(200).json({ message: 'API is running successfully!' });
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// TODO: Mount your application routes here
-// Example: app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/board', boardRoutes);
 
-// --- Error Handling Middleware (Should be the last) ---
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Backend server is running on http://localhost:${PORT}`);
-    // TODO: Connect to the database
-});
+const PORT = process.env.PORT || 5000;
+
+connectDB()
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`Backend server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Failed to start server due to database connection error.', error);
+    process.exit(1);
+  });

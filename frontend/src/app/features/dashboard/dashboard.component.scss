@@ -1,0 +1,50 @@
+:host {
+  display: block;
+  width: 100%;
+  background: radial-gradient(circle at top left, rgba(30, 64, 175, 0.15), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.12), transparent 60%),
+    #020617;
+  min-height: 100vh;
+}
+
+.column-wrapper {
+  cursor: grab;
+}
+
+.column-card {
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.column-card:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 20px 45px -20px rgba(16, 185, 129, 0.4);
+}
+
+.task-card {
+  cursor: grab;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 0.75rem;
+  box-shadow: 0 35px 60px -25px rgba(15, 118, 110, 0.6);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.column-wrapper:last-child .column-card {
+  margin-right: 0;
+}
+
+@media (max-width: 768px) {
+  .column-card {
+    min-width: 240px;
+  }
+}

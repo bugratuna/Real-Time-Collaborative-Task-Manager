@@ -1,0 +1,177 @@
+<section class="flex min-h-screen flex-col bg-slate-950 text-slate-100">
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur">
+    <div class="mx-auto flex w-full max-w-7xl flex-col gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-3xl font-semibold text-white">Real-time workspace</h1>
+        <p class="text-sm text-slate-300">
+          Plan your day together — mornings, afternoons, and evenings update instantly for everyone connected.
+        </p>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="text-right">
+          <p class="font-medium text-white">{{ user()?.name }}</p>
+          <p class="text-sm text-slate-400">{{ user()?.email }}</p>
+        </div>
+        <button mat-stroked-button color="accent" (click)="logout()">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 overflow-hidden">
+    <div class="mx-auto flex h-full max-w-7xl flex-col px-6 py-8">
+      <div *ngIf="loadingBoard()" class="flex flex-1 items-center justify-center">
+        <mat-progress-spinner diameter="60" mode="indeterminate" color="accent"></mat-progress-spinner>
+      </div>
+
+      <ng-container *ngIf="!loadingBoard()">
+        <div class="flex flex-1 flex-col gap-6 overflow-hidden">
+          <div class="flex items-start gap-6 overflow-x-auto pb-6" cdkDropListGroup>
+            <div
+              cdkDropList
+              class="flex gap-6"
+              cdkDropListOrientation="horizontal"
+              [cdkDropListData]="board()?.columns ?? []"
+              (cdkDropListDropped)="handleColumnDrop($event)"
+            >
+              <div
+                *ngFor="let column of board()?.columns; trackBy: trackColumn"
+                cdkDrag
+                [cdkDragData]="column"
+                [cdkDragDisabled]="mutating()"
+                class="column-wrapper flex-shrink-0"
+              >
+                <div
+                  cdkDropList
+                  [id]="column.id"
+                  [cdkDropListConnectedTo]="connectedDropLists(column.id)"
+                  [cdkDropListData]="column.tasks"
+                  (cdkDropListDropped)="handleTaskDrop($event, column)"
+                  class="column-card min-w-[280px] max-w-[320px] rounded-xl border border-slate-700/60 bg-slate-900/70 p-5 backdrop-blur"
+                >
+                  <div class="mb-4 flex items-start justify-between gap-2">
+                    <ng-container *ngIf="editingColumnId() === column.id; else columnTitle">
+                      <input
+                        [formControl]="editColumnControl"
+                        (keydown.enter)="commitColumnTitle(column.id, $event)"
+                        (keydown.escape)="cancelColumnEdit()"
+                        (blur)="commitColumnTitle(column.id, $event)"
+                        type="text"
+                        class="w-full rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+                        placeholder="Rename topic"
+                        [disabled]="mutating()"
+                      />
+                    </ng-container>
+
+                    <ng-template #columnTitle>
+                      <h2 class="text-lg font-semibold text-white">{{ column.title }}</h2>
+                    </ng-template>
+
+                    <button
+                      mat-icon-button
+                      type="button"
+                      class="!text-slate-300 hover:!text-emerald-300"
+                      (click)="startEditColumn(column)"
+                      [disabled]="mutating()"
+                      aria-label="Rename column"
+                    >
+                      <mat-icon fontIcon="edit"></mat-icon>
+                    </button>
+                  </div>
+
+                  <div class="space-y-3">
+                    <div
+                      *ngFor="let task of column.tasks; trackBy: trackTask"
+                      cdkDrag
+                      [cdkDragData]="{ task: task, columnId: column.id }"
+                      [cdkDragDisabled]="mutating()"
+                      class="task-card group rounded-lg border border-slate-700/60 bg-slate-800/70 p-4 shadow transition hover:border-emerald-400/60 hover:shadow-emerald-500/10"
+                    >
+                      <ng-container *ngIf="isEditingTask(column.id, task.id); else taskDisplay">
+                        <input
+                          [formControl]="editTaskControl"
+                          (keydown.enter)="commitTaskTitle(column.id, task.id, $event)"
+                          (keydown.escape)="cancelTaskEdit()"
+                          (blur)="commitTaskTitle(column.id, task.id, $event)"
+                          type="text"
+                          class="w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+                          placeholder="Task title"
+                          [disabled]="mutating()"
+                        />
+                      </ng-container>
+
+                      <ng-template #taskDisplay>
+                        <div class="flex items-start justify-between gap-2">
+                          <p class="text-sm font-medium text-white">{{ task.title }}</p>
+                          <button
+                            mat-icon-button
+                            type="button"
+                            class="!text-slate-400 opacity-0 transition group-hover:opacity-100 hover:!text-emerald-300"
+                            (click)="startEditTask(column.id, task)"
+                            [disabled]="mutating()"
+                            aria-label="Rename task"
+                          >
+                            <mat-icon fontIcon="drive_file_rename_outline"></mat-icon>
+                          </button>
+                        </div>
+                      </ng-template>
+                    </div>
+
+                    <form (ngSubmit)="addTask(column.id)" class="mt-3 space-y-3">
+                      <input
+                        type="text"
+                        [value]="taskDraft(column.id)"
+                        (input)="setTaskDraft(column.id, $any($event.target).value)"
+                        placeholder="Add a task"
+                        class="w-full rounded-md border border-dashed border-slate-600 bg-slate-900 px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+                        [disabled]="mutating()"
+                      />
+                      <button
+                        mat-stroked-button
+                        color="accent"
+                        type="submit"
+                        class="w-full"
+                        [disabled]="mutating() || !taskDraft(column.id).trim()"
+                      >
+                        Add task
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="min-w-[280px] max-w-[320px] flex-shrink-0 rounded-xl border border-dashed border-slate-600/80 bg-slate-900/40 p-5 backdrop-blur"
+            >
+              <form class="space-y-3" (ngSubmit)="addColumn()">
+                <h3 class="text-base font-semibold text-white">Add a new topic</h3>
+                <input
+                  type="text"
+                  [formControl]="newColumnControl"
+                  placeholder="Morning, Afternoon, Evening..."
+                  class="w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+                  [disabled]="mutating()"
+                />
+                <button
+                  mat-flat-button
+                  color="primary"
+                  type="submit"
+                  class="w-full"
+                  [disabled]="mutating() || newColumnControl.invalid"
+                >
+                  Create topic
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <p *ngIf="!hasColumns" class="text-center text-sm text-slate-400">
+            Start by adding a topic like <span class="text-emerald-300 font-medium">Morning</span> or
+            <span class="text-emerald-300 font-medium">Evening</span>, then drop tasks inside. Drag items between sections and
+            rename them to keep everyone instantly updated.
+          </p>
+        </div>
+      </ng-container>
+    </div>
+  </main>
+</section>
