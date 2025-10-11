@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { LoginRequest } from '../../../core/types/auth.types';
@@ -40,9 +41,10 @@ export class LoginComponent {
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
+  private readonly formStatus = toSignal(this.form.statusChanges, { initialValue: this.form.status });
   readonly isSubmitting = signal(false);
   readonly passwordVisible = signal(false);
-  readonly submitDisabled = computed(() => this.form.invalid || this.isSubmitting());
+  readonly submitDisabled = computed(() => this.formStatus() !== 'VALID' || this.isSubmitting());
 
   togglePasswordVisibility(): void {
     this.passwordVisible.update((value) => !value);

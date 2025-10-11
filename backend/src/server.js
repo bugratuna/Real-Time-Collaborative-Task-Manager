@@ -7,6 +7,7 @@ const { Server } = require('socket.io');
 
 const { connectDB } = require('./config/database');
 const authRoutes = require('./routes/auth.routes');
+const boardRoutes = require('./routes/task-board.routes');
 const { errorHandler, notFoundHandler } = require('./middleware/error-handler');
 const { registerSocketHandlers } = require('./socket');
 
@@ -39,6 +40,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/board', boardRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

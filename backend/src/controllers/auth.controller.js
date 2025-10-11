@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
+const TaskBoard = require('../models/task-board.model');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
@@ -25,6 +26,8 @@ const register = async (req, res, next) => {
       email,
       password: hashedPassword
     });
+
+    await TaskBoard.create({ user: user.id, columns: [] });
 
     const token = generateToken(user.id);
 
